@@ -1,6 +1,9 @@
 import { Application, send } from "../src/deps.ts";
 import snippetRouter from "./routes/snippet.ts";
 
+// Open Deno KV storage
+import "./../kv/kvClient.ts";
+
 const app = new Application();
 
 // logging
@@ -24,7 +27,7 @@ app.use(async (ctx, next) => {
   }
 });
 
-const PORT = 8087
-console.log(`🚀 Server started at http://localhost:${PORT}`)
+const PORT = 8087;
+console.log(`🚀 Server started at http://localhost:${PORT}`);
 
 await app.listen({ port: PORT });

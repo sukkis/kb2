@@ -1,0 +1,5 @@
+{
+  "imports": {
+    "@std/uuid": "jsr:@std/uuid@^1.0.9"
+  }
+}
