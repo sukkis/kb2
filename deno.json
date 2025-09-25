@@ -1,5 +1,14 @@
 {
+  "tasks": {
+    "dev": "deno run --allow-net=0.0.0.0:8087 --allow-read=./public --allow-write=./kv --unstable-kv src/main.ts",
+    "test": "deno test --allow-net --allow-read --allow-write --allow-env --unstable-kv -R"
+  },
   "imports": {
     "@std/uuid": "jsr:@std/uuid@^1.0.9"
-  }
+  },
+  "exclude": [
+    "**/testRouter.ts",
+    "tests/",
+    "scripts/"
+  ]
 }

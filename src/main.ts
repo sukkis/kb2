@@ -1,8 +1,5 @@
 import { Application, send } from "../src/deps.ts";
-import snippetRouter from "./routes/snippet.ts";
-
-// Open Deno KV storage
-import "./../kv/kvClient.ts";
+import { createProdRouter } from "./routes/router.ts";
 
 const app = new Application();
 
@@ -12,8 +9,9 @@ app.use(async (ctx, next) => {
   await next();
 });
 
-app.use(snippetRouter.routes());
-app.use(snippetRouter.allowedMethods());
+// src/routes/router.ts handles this, we just call the function
+app.use(createProdRouter().routes());
+app.use(createProdRouter().allowedMethods());
 
 // static file serving
 app.use(async (ctx, next) => {
