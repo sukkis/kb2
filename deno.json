@@ -1,14 +1,17 @@
 {
   "tasks": {
     "dev": "deno run --allow-net=0.0.0.0:8087 --allow-read=./public --allow-write=./kv --unstable-kv src/main.ts",
-    "test": "deno test --allow-net --allow-read --allow-write --allow-env --unstable-kv -R"
+    "test": "deno test --allow-net --allow-read --allow-write --allow-import --allow-env --unstable-kv -R"
   },
   "imports": {
-    "@std/uuid": "jsr:@std/uuid@^1.0.9"
+    "@oak/oak": "jsr:@oak/oak@^17.1.6",
+    "@std/uuid": "jsr:@std/uuid@^1.0.9",
+    "superdeno": "https://deno.land/x/superdeno@5.0.1/mod.ts",
+    "superoak": "https://deno.land/x/superoak@5.0.0/mod.ts",
+    "@std/asserts": "jsr:@std/assert@^0.224.0"
   },
   "exclude": [
     "**/testRouter.ts",
-    "tests/",
     "scripts/"
   ]
 }
