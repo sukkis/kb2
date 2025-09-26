@@ -1,7 +1,10 @@
 import { kv } from "./kvClient.ts";
 
 // add single snippet to KV
-export async function saveSnippet(uuid, snippet) {
+export async function saveSnippet(
+  uuid: string,
+  snippet: Record<string, unknown>,
+) {
   await kv.set(["snippets", uuid], snippet);
 }
 

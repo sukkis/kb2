@@ -13,9 +13,8 @@
  *   (You can add more test‑only routes here later.)
  */
 
-import { Application, Router, Context } from "../deps.ts";
-//import { Application, Router, Context } from "@oak/oak"; 
-
+import { Application, Context, Router } from "../deps.ts";
+import snippetRouter from "./snippet.ts";
 
 /**
  * Build an Oak `Application` that uses the supplied KV.
@@ -33,27 +32,22 @@ export function createTestApp(kvInstance: Deno.Kv): Application {
   // Expose the test KV globally – the only place that does this.
   (globalThis as any).__TEST_KV__ = kvInstance;
 
-  const router = new Router();
-
-  router.get("/health", (ctx: Context) => {
+  // we have this only here, and the rest of the routes come from production side
+  const healthRouter = new Router();
+  healthRouter.get("/health", (ctx: Context) => {
     ctx.response.type = "application/json";
     ctx.response.body = {
-    status: "ok",
-    timestamp: new Date().toISOString(),
+      status: "ok",
+      timestamp: new Date().toISOString(),
     };
   });
 
-  // -----------------------------------------------------------------
-  // (Optional) you could mount the real snippet routes here if you
-  // want to test them together with the health endpoint:
-  //   import snippetRouter from "./snippet.ts";
-  //   router.use(snippetRouter.routes());
-  //   router.use(snippetRouter.allowedMethods());
-  // -----------------------------------------------------------------
-
   const app = new Application();
-  app.use(router.routes());
-  app.use(router.allowedMethods());
+  app.use(healthRouter.routes());
+  app.use(healthRouter.allowedMethods());
+
+  app.use(snippetRouter.routes());
+  app.use(snippetRouter.allowedMethods());
 
   return app;
 }
