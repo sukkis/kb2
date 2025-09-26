@@ -9,6 +9,7 @@
 
 import { Router } from "../deps.ts"; // Oak router
 import snippetRouter from "./snippet.ts"; // <-- your existing snippet routes
+import swaggerUIRouter from "./swagger_ui.ts"; // Swagger UI docs router
 
 // ---------------------------------------------------------------------
 // Helper: builds a router that mounts all feature routers.
@@ -27,8 +28,13 @@ export function createProdRouter(): Router {
   // Mount the snippet router under its own base path.
   // If you ever want a prefix (e.g. "/api"), just change the
   // second argument: `router.use("/api", snippetRouter.routes())`.
+
   router.use(snippetRouter.routes());
   router.use(snippetRouter.allowedMethods());
+
+  // Mount Swagger UI and OpenAPI spec endpoints
+  router.use(swaggerUIRouter.routes());
+  router.use(swaggerUIRouter.allowedMethods());
 
   return router;
 }
