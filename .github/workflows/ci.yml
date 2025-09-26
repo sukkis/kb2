@@ -1,0 +1,66 @@
+name: CI
+
+# Trigger on pushes, PRs, and when the default branch is updated
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  # Run the same job on Linux, macOS and Windows – helps catch OS specific issues
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+      # ---------------------------------------------------------
+      # 1️⃣  Checkout the repository
+      # ---------------------------------------------------------
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ---------------------------------------------------------
+      # 2️⃣  Set up Deno (latest stable)
+      # ---------------------------------------------------------
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v1.x   # picks the newest stable release
+
+      # ---------------------------------------------------------
+      # 3️⃣  Cache Deno's module directory ($HOME/.deno)
+      # ---------------------------------------------------------
+      - name: Cache Deno modules
+        uses: actions/cache@v4
+        with:
+          path: ~/.deno
+          # The cache key includes the lock file so a change in deps busts the cache
+          key: ${{ runner.os }}-deno-${{ hashFiles('deno.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-deno-
+
+      # ---------------------------------------------------------
+      # 4️⃣  Lint the codebase
+      # ---------------------------------------------------------
+      - name: Run Deno lint
+        run: deno lint
+
+      # ---------------------------------------------------------
+      # 5️⃣  Run the test suite (uses the task you defined)
+      # ---------------------------------------------------------
+      - name: Run tests
+        # The task already contains the needed permission flags
+        run: deno task test
+
+      # ---------------------------------------------------------
+      # 6️⃣  (Optional) Upload test results as artifacts
+      # ---------------------------------------------------------
+      # - name: Upload test report
+      #   if: failure()
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: test-output
+      #     path: ./test-results/
