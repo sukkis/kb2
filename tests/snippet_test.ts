@@ -1,5 +1,4 @@
 import {
-  type Application as _Application,
   assertEquals,
   assertObjectMatch,
   defineTestSuite,
