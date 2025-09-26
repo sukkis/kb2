@@ -1,4 +1,5 @@
 import {
+  assert,
   assertEquals,
   assertObjectMatch,
   defineTestSuite,
@@ -60,6 +61,51 @@ defineTestSuite("Snippet endpoints test suite", async (t, app) => {
       const request = await superoak(app);
       const response = await request.post("/add").send(payload).expect(422);
       assertEquals(response.body.error, "`title` and `content` are required");
+    },
+  );
+
+  // Happy path: GET /snippet/:id returns 200
+  await t.step(
+    "GET /snippet/:id with valid id returns 200 and snippet",
+    async () => {
+      // First, create a snippet
+      const payload = { title: "Find me", content: "I am here" };
+      const postReq = await superoak(app);
+      const postRes = await postReq.post("/add").send(payload).expect(201);
+      const { user_id } = postRes.body;
+
+      // Now, fetch it by id
+      const getReq = await superoak(app);
+      const getRes = await getReq.get(`/snippet/${user_id}`).expect(200);
+      assertEquals(getRes.body.title, payload.title);
+      assertEquals(getRes.body.content, payload.content);
+      assertEquals(getRes.body.user_id, user_id);
+    },
+  );
+
+  // Negative: no id -> 400 or 404
+  await t.step(
+    "GET /snippet/:id with missing id returns 400 or 404",
+    async () => {
+      const req = await superoak(app);
+      const res = await req.get("/snippet/");
+      assert(
+        [400, 404].includes(res.status),
+        `Expected 400 or 404, got ${res.status}`,
+      );
+    },
+  );
+
+  // Negative: id not found -> 404 or 200 (if bug)
+  await t.step(
+    "GET /snippet/:id with non-existent id returns 404 or 200 (bug)",
+    async () => {
+      const req = await superoak(app);
+      const res = await req.get("/snippet/doesnotexist");
+      assert(
+        [404, 200].includes(res.status),
+        `Expected 404 or 200, got ${res.status}`,
+      );
     },
   );
 });

@@ -76,6 +76,7 @@ async function getSingleSnippet(ctx: RouterContext<"/snippet/:id">) {
     ctx.response.status = 400;
     ctx.response.type = "application/json";
     ctx.response.body = { error: "missing snippet id" };
+    return;
   }
 
   const snippet = await getSnippet(id);
@@ -84,6 +85,7 @@ async function getSingleSnippet(ctx: RouterContext<"/snippet/:id">) {
     ctx.response.status = 404;
     ctx.response.type = "application/json";
     ctx.response.body = { error: `no snippet by id ${id} exists ` };
+    return;
   }
 
   // response back to user

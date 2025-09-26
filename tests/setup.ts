@@ -85,6 +85,6 @@ export function defineTestSuite(
 }
 
 // Re-export common test utilities
-export { assertEquals, assertObjectMatch } from "@std/asserts";
+export { assert, assertEquals, assertObjectMatch } from "@std/assert";
 export { superoak } from "./superoak_wrapper.ts";
 export type { Application } from "../src/deps.ts";
