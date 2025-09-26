@@ -64,28 +64,6 @@ export async function teardownSuite(): Promise<void> {
   }
 }
 
-// abstract away other things than just doing the test
-// try to make test files minimal and have the complexity in scaffolding
-// export function defineTestSuite(
-//   name: string,
-//   testSteps: (app: Application) => Promise<void>
-// ): void {
-//   Deno.test(name, async (t) => {
-//     const suite = await initSuite();
-//     const app = suite.app;
-
-//     await t.step("reset KV before each test", async () => {
-//       await resetKv();
-//     });
-
-//     await testSteps(app);
-
-//     await t.step("teardown suite", async () => {
-//       await teardownSuite();
-//     });
-//   });
-// }
-
 export function defineTestSuite(
   name: string,
   steps: (t: Deno.TestContext, app: Application) => Promise<void>,

@@ -1,6 +1,5 @@
-// snippet_test.ts
 import {
-  type _Application,
+  type Application as _Application,
   assertEquals,
   assertObjectMatch,
   defineTestSuite,
