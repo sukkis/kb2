@@ -1,9 +1,8 @@
-// tests/setup.ts
 /**
  * Centralised test‑suite fixture.
  *
  * - Creates a temporary KV store (file‑backed) **once**.
- * - Builds the test‑only Oak application using that KV.
+ * - Builds the test-only Oak application using that KV.
  * - Exposes a `resetKv` helper that wipes the KV between tests.
  *
  * Import this module in any test file that needs the app/KV.
@@ -37,13 +36,13 @@ export async function resetKv(): Promise<void> {
  * It creates the KV, the app, and stores the temp‑dir path for later removal.
  */
 export async function initSuite(): Promise<{ app: Application; kv: Deno.Kv }> {
-  // 1️⃣  Create a temporary folder (OS‑wide temp dir)
+  // Create a temporary folder (OS‑wide temp dir)
   tmpDir = await Deno.makeTempDir({ prefix: "kv_test_suite_" });
 
-  // 2️⃣  Open a KV backed by a SQLite file inside that folder.
+  // Open a KV backed by a SQLite file inside that folder.
   kv = await Deno.openKv(`${tmpDir}/kv.sqlite`);
 
-  // 3️⃣  Build the test‑only Oak app, injecting the KV.
+  // Build the test‑only Oak app, injecting the KV.
   app = createTestApp(kv);
 
   // Return both so the test file can destructure if it wants.
@@ -64,3 +63,50 @@ export async function teardownSuite(): Promise<void> {
     // ignore – the folder may already be gone
   }
 }
+
+// abstract away other things than just doing the test
+// try to make test files minimal and have the complexity in scaffolding
+// export function defineTestSuite(
+//   name: string,
+//   testSteps: (app: Application) => Promise<void>
+// ): void {
+//   Deno.test(name, async (t) => {
+//     const suite = await initSuite();
+//     const app = suite.app;
+
+//     await t.step("reset KV before each test", async () => {
+//       await resetKv();
+//     });
+
+//     await testSteps(app);
+
+//     await t.step("teardown suite", async () => {
+//       await teardownSuite();
+//     });
+//   });
+// }
+
+export function defineTestSuite(
+  name: string,
+  steps: (t: Deno.TestContext, app: Application) => Promise<void>,
+): void {
+  Deno.test(name, async (t) => {
+    const suite = await initSuite();
+    const app = suite.app;
+
+    await t.step("reset KV before each test", async () => {
+      await resetKv();
+    });
+
+    await steps(t, app);
+
+    await t.step("teardown suite", async () => {
+      await teardownSuite();
+    });
+  });
+}
+
+// Re-export common test utilities
+export { assertEquals, assertObjectMatch } from "@std/asserts";
+export { superoak } from "./superoak_wrapper.ts";
+export type { Application } from "../src/deps.ts";

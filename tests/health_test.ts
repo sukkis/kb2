@@ -1,16 +1,18 @@
-import { assertEquals, assertObjectMatch } from "@std/asserts";
-
-import { superoak } from "./superoak_wrapper.ts";
-
-import { initSuite, resetKv, teardownSuite } from "./setup.ts";
-
-import type { Application } from "../src/deps.ts"; // <-- bring the type in
+import {
+  type Application,
+  assertEquals,
+  assertObjectMatch,
+  initSuite,
+  resetKv,
+  superoak,
+  teardownSuite,
+} from "./setup.ts";
 
 let app: Application; // will be set in the suite’s before-all step
 
 Deno.test("Health endpoint suite", async (t) => {
   // ---------------------------------------------------------
-  // Suite‑wide setup (runs once)
+  // Suite setup (runs once)
   // ---------------------------------------------------------
   await t.step("setup suite", async () => {
     const suite = await initSuite();
@@ -40,7 +42,7 @@ Deno.test("Health endpoint suite", async (t) => {
   });
 
   // ---------------------------------------------------------
-  // Suite‑wide teardown (runs once after all tests)
+  // Suite teardown (runs once after all tests)
   // ---------------------------------------------------------
   await t.step("teardown suite", async () => {
     await teardownSuite();

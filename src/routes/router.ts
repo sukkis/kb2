@@ -16,7 +16,7 @@ import snippetRouter from "./snippet.ts"; // <-- your existing snippet routes
 export function createProdRouter(): Router {
   const router = new Router();
 
-  // Health‑check / root endpoint – keeps the server alive and
+  // Health check / root endpoint – keeps the server alive and
   // gives a quick “everything is up” response.
   router.get("/health", (ctx) => {
     ctx.response.body = {

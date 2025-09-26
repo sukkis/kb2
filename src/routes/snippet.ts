@@ -1,5 +1,4 @@
-// src/routes/snippet.ts
-import { Context, Router } from "../deps.ts"; // Oak symbols re‑exported in deps.ts
+import { Context, Router, RouterContext } from "../deps.ts"; // Oak symbols re‑exported in deps.ts
 import { getSnippet, isoTimestamp, saveSnippet } from "../../kv/kvSnippet.ts"; // we need to open Deno KV for persistence and make the handle available.
 
 // Handler that just writes “hello” as plain‑text
@@ -35,7 +34,7 @@ async function addSnippet(ctx: Context) {
 
   // convert from Unix Epoch to ISO format
   const formatted = isoTimestamp(Date.now());
-  const created: json = {
+  const created: Record<string, unknown> = {
     user_id: uuid,
     title: payload.title,
     content: payload.content,
@@ -51,7 +50,7 @@ async function addSnippet(ctx: Context) {
   ctx.response.body = created;
 }
 
-async function getSingleSnippet(ctx: Context) {
+async function getSingleSnippet(ctx: RouterContext<"/snippet/:id">) {
   const id = ctx.params.id;
 
   if (!id) {
@@ -71,7 +70,7 @@ async function getSingleSnippet(ctx: Context) {
   // response back to user
   ctx.response.status = 200;
   ctx.response.type = "application/json";
-  ctx.response.body = snippet;
+  ctx.response.body = snippet as Record<string, unknown>;
 }
 
 // Build the router and expose it
