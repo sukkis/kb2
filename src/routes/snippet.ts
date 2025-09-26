@@ -9,20 +9,39 @@ function sayHello(ctx: Context) {
 }
 
 async function addSnippet(ctx: Context) {
-  // Ensure a body exists
-  if (!ctx.request.hasBody) {
+  // Robustly handle missing, empty, or invalid JSON body
+  let payload: unknown = undefined;
+  try {
+    if (!ctx.request.hasBody) {
+      throw new Error("missing request body");
+    }
+    const body = ctx.request.body({ type: "json" });
+    payload = await body.value;
+    // If payload is null/undefined/empty object, treat as missing
+    if (
+      payload == null ||
+      (typeof payload === "object" &&
+        Object.keys(payload as object).length === 0)
+    ) {
+      throw new Error("missing request body");
+    }
+  } catch (_err) {
     ctx.response.status = 400;
     ctx.response.type = "application/json";
     ctx.response.body = { error: "missing request body" };
     return;
   }
 
-  // Parse the JSON payload
-  const body = ctx.request.body({ type: "json" });
-  const payload = await body.value; // { title: string, content: string }
-
   // Payload validation
-  if (!payload.title || !payload.content) {
+  // Type guard for payload
+  if (
+    typeof payload !== "object" ||
+    payload === null ||
+    !("title" in payload) ||
+    !("content" in payload) ||
+    !(payload as Record<string, unknown>).title ||
+    !(payload as Record<string, unknown>).content
+  ) {
     ctx.response.status = 422;
     ctx.response.type = "application/json";
     ctx.response.body = { error: "`title` and `content` are required" };

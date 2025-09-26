@@ -30,4 +30,36 @@ defineTestSuite("Snippet endpoints test suite", async (t, app) => {
       assertEquals(typeof body.timestamp, "string");
     },
   );
+
+  // Negative test: body missing -> 400
+  await t.step(
+    "POST /add with missing body returns 400",
+    async () => {
+      const request = await superoak(app);
+      const response = await request.post("/add").expect(400);
+      assertEquals(response.body.error, "missing request body");
+    },
+  );
+
+  // Negative test: title missing -> 422
+  await t.step(
+    "POST /add with missing title returns 422",
+    async () => {
+      const payload = { content: "No title here" };
+      const request = await superoak(app);
+      const response = await request.post("/add").send(payload).expect(422);
+      assertEquals(response.body.error, "`title` and `content` are required");
+    },
+  );
+
+  // Negative test: content missing -> 422
+  await t.step(
+    "POST /add with missing content returns 422",
+    async () => {
+      const payload = { title: "No content here" };
+      const request = await superoak(app);
+      const response = await request.post("/add").send(payload).expect(422);
+      assertEquals(response.body.error, "`title` and `content` are required");
+    },
+  );
 });
