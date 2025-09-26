@@ -1,3 +1,4 @@
+---
 openapi: 3.0.0
 info:
   title: kb2 API
@@ -18,3 +19,183 @@ paths:
                   status:
                     type: string
                     example: ok
+
+  /add:
+    post:
+      summary: Add a new snippet
+      description: >
+        Creates a new code snippet. Requires a JSON body with `title` and `content` fields.
+        Returns the created snippet with a generated `uuid` and `timestamp`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - title
+                - content
+              properties:
+                title:
+                  type: string
+                  example: Test Snippet
+                content:
+                  type: string
+                  example: This is a test snippet.
+      responses:
+        "201":
+          description: Snippet created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  uuid:
+                    type: string
+                    description: Unique identifier for the snippet
+                  title:
+                    type: string
+                  content:
+                    type: string
+                  timestamp:
+                    type: string
+                    format: date-time
+        "400":
+          description: Missing request body
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: missing request body
+        "422":
+          description: Missing required fields
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: '`title` and `content` are required'
+
+  /snippet/{id}:
+    get:
+      summary: Get a single snippet by ID
+      description: >
+        Retrieves a snippet by its unique identifier. Returns the snippet if found.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the snippet
+      responses:
+        "200":
+          description: Snippet found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  uuid:
+                    type: string
+                  title:
+                    type: string
+                  content:
+                    type: string
+                  timestamp:
+                    type: string
+                    format: date-time
+        "400":
+          description: Missing snippet id
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: missing snippet id
+        "404":
+          description: Snippet not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  example: no snippet by id {id} exists
+  /snippets:
+    get:
+      summary: List all snippets
+      description: >
+        Returns an array of all code snippets stored on the server. Each snippet object contains `uuid`, `title`, `content`, and `timestamp` fields. If no snippets exist, returns an empty array.
+      responses:
+        "200":
+          description: Array of snippet objects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    uuid:
+                      type: string
+                      description: Unique identifier for the snippet
+                    title:
+                      type: string
+                    content:
+                      type: string
+                    timestamp:
+                      type: string
+                      format: date-time
+
+  /delete/{id}:
+    delete:
+      summary: Delete a snippet by ID
+      description: >
+        Deletes a snippet by its unique identifier. Returns a confirmation message if successful.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the snippet to delete
+      responses:
+        "200":
+          description: Snippet deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Snippet deleted
+        "400":
+          description: Missing snippet id
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: missing snippet id
+        "404":
+          description: Snippet not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: no snippet by id {id} exists
