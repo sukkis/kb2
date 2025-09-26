@@ -1,6 +1,6 @@
 {
   "tasks": {
-    "dev": "deno run --allow-net=0.0.0.0:8087 --allow-read=./public --allow-write=./kv --unstable-kv src/main.ts",
+    "dev": "deno run --allow-net=0.0.0.0:8087 --allow-read=./openapi.yaml,./openapi.yaml.br,./openapi.yaml.gz,./public,./swagger-ui --allow-write=./kv --unstable-kv src/main.ts",
     "test": "deno test --allow-net --allow-read --allow-write --allow-import --allow-env --unstable-kv -R"
   },
   "imports": {
@@ -13,5 +13,11 @@
   "exclude": [
     "**/testRouter.ts",
     "scripts/"
-  ]
+  ],
+  "lint": {
+    "exclude": ["swagger-ui"]
+  },
+  "fmt": {
+    "exclude": ["swagger-ui"]
+  }
 }
