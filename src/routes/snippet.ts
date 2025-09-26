@@ -1,5 +1,11 @@
 import { Context, Router, RouterContext } from "../deps.ts"; // Oak symbols re‑exported in deps.ts
-import { getSnippet, isoTimestamp, saveSnippet } from "../../kv/kvSnippet.ts"; // we need to open Deno KV for persistence and make the handle available.
+import {
+  getSnippet,
+  isoTimestamp,
+  listSnippets,
+  saveSnippet,
+} from "../../kv/kvSnippet.ts"; // we need to open Deno KV for persistence and make the handle available.
+import { getKv } from "../../kv/kvClient.ts";
 
 // Handler that just writes “hello” as plain‑text
 function sayHello(ctx: Context) {
@@ -49,19 +55,19 @@ async function addSnippet(ctx: Context) {
   }
 
   // a unique identifier for the snippet
-  const uuid = crypto.randomUUID();
+  const unique_id = crypto.randomUUID();
 
   // convert from Unix Epoch to ISO format
   const formatted = isoTimestamp(Date.now());
   const created: Record<string, unknown> = {
-    user_id: uuid,
+    uuid: unique_id,
     title: payload.title,
     content: payload.content,
     timestamp: formatted,
   };
 
   // persist the snippet in Deno KV
-  await saveSnippet(uuid, created);
+  await saveSnippet(unique_id, created);
 
   // response back to user
   ctx.response.status = 201;
@@ -88,10 +94,61 @@ async function getSingleSnippet(ctx: RouterContext<"/snippet/:id">) {
     return;
   }
 
-  // response back to user
   ctx.response.status = 200;
   ctx.response.type = "application/json";
   ctx.response.body = snippet as Record<string, unknown>;
+}
+
+// delete single snippet by id
+async function deleteSnippet(ctx: RouterContext<"/delete/:id">) {
+  const id = ctx.params.id;
+
+  if (!id) {
+    ctx.response.status = 400;
+    ctx.response.type = "application/json";
+    ctx.response.body = { error: "missing snippet id" };
+    return;
+  }
+
+  const snippet = await getSnippet(id);
+
+  if (!snippet) {
+    ctx.response.status = 404;
+    ctx.response.type = "application/json";
+    ctx.response.body = { error: `no snippet by id ${id} exists ` };
+    return;
+  }
+
+  await getKv().delete(["snippets", id]);
+
+  ctx.response.status = 200;
+  ctx.response.type = "application/json";
+  ctx.response.body = { message: `snippet with id ${id} deleted` };
+}
+
+// list all snippets
+async function listAllSnippets(ctx: Context) {
+  // request body is not expected for GET /snippets
+  if (ctx.request.hasBody) {
+    ctx.response.status = 400;
+    ctx.response.type = "application/json";
+    ctx.response.body = { error: "GET /snippets does not accept a body" };
+    return;
+  }
+
+  if ([...ctx.request.url.searchParams].length > 0) {
+    ctx.response.status = 400;
+    ctx.response.type = "application/json";
+    ctx.response.body = {
+      error: "GET /snippets does not accept query parameters",
+    };
+    return;
+  }
+
+  const snippets = await listSnippets();
+  ctx.response.status = 200;
+  ctx.response.type = "application/json";
+  ctx.response.body = snippets.length === 0 ? [] : snippets;
 }
 
 // Build the router and expose it
@@ -100,5 +157,7 @@ const router = new Router();
 router.get("/", sayHello);
 router.post("/add", addSnippet);
 router.get("/snippet/:id", getSingleSnippet);
+router.delete("/delete/:id", deleteSnippet);
+router.get("/snippets", listAllSnippets);
 
 export default router; // ← this is what main.ts will import
