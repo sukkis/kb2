@@ -30,19 +30,19 @@ async function addSnippet(ctx: Context) {
   }
 
   // a unique identifier for the snippet
-  const uuid = crypto.randomUUID();
+  const unique_id = crypto.randomUUID();
 
   // convert from Unix Epoch to ISO format
   const formatted = isoTimestamp(Date.now());
   const created: Record<string, unknown> = {
-    user_id: uuid,
+    uuid: unique_id,
     title: payload.title,
     content: payload.content,
     timestamp: formatted,
   };
 
   // persist the snippet in Deno KV
-  await saveSnippet(uuid, created);
+  await saveSnippet(unique_id, created);
 
   // response back to user
   ctx.response.status = 201;
