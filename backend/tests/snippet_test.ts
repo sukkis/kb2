@@ -1,3 +1,4 @@
+import { Snippet } from "../../shared/types.ts";
 import {
   assert,
   assertEquals,
@@ -19,7 +20,7 @@ defineTestSuite("Snippet endpoints test suite", async (t, app) => {
       const request = await superoak(app);
       const response = await request.post("/add").send(payload).expect(201);
 
-      const body = response.body as Record<string, unknown>;
+      const body = response.body as Snippet;
 
       // Basic shape check
       assertObjectMatch(body, {
@@ -181,7 +182,7 @@ defineTestSuite("Snippet endpoints test suite", async (t, app) => {
     // Fetch the list
     const listReq = await superoak(app);
     const listRes = await listReq.get("/snippets").expect(200); // Adjusted to /list
-    const body = listRes.body as Array<Record<string, unknown>>;
+    const body = listRes.body as Array<Snippet>;
 
     // Verify we got all snippets
     assertEquals(body.length, snippetsToAdd.length);

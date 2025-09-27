@@ -1,32 +1,27 @@
 import { getKv } from "./kvClient.ts";
-export interface Snippet {
-  uuid: string;
-  title: string;
-  content: string;
-  timestamp: number;
-}
+import { Snippet } from "../../shared/types.ts";
 
 export async function saveSnippet(
   uuid: string,
-  snippet: Record<string, unknown>,
+  snippet: Snippet,
 ) {
   await getKv().set(["snippets", uuid], snippet);
 }
 
-export async function getSnippet(uuid: string) {
+export async function getSnippet(uuid: string): Promise<Snippet | null> {
   const entry = await getKv().get(["snippets", uuid]);
-  return entry.value;
+  return entry.value as Snippet | null;
 }
 
 export async function deleteSnippet(uuid: string) {
   await getKv().delete(["snippets", uuid]);
 }
 
-export async function listSnippets(): Promise<Array<Record<string, unknown>>> {
-  const snippets: Array<Record<string, unknown>> = [];
+export async function listSnippets(): Promise<Snippet[]> {
+  const snippets: Snippet[] = [];
   for await (const entry of getKv().list({ prefix: ["snippets"] })) {
     if (entry.value) {
-      snippets.push(entry.value as Record<string, unknown>);
+      snippets.push(entry.value as Snippet);
     }
   }
   return snippets;

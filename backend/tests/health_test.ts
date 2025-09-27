@@ -1,3 +1,4 @@
+import { Snippet } from "../../shared/types.ts";
 import {
   type Application,
   assertEquals,
@@ -33,12 +34,12 @@ Deno.test("Health endpoint suite", async (t) => {
     const request = await superoak(app);
     const response = await request.get("/health").expect(200);
 
-    const body = response.body as Record<string, unknown>;
+    const body = response.body as Snippet;
     assertObjectMatch(body, { status: "ok" });
 
-    const ts = body.timestamp as string;
+    const ts = body.timestamp as number;
     const isoRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
-    assertEquals(isoRegex.test(ts), true);
+    assertEquals(isoRegex.test(String(ts)), true);
   });
 
   // ---------------------------------------------------------

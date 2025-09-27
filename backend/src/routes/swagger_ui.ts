@@ -8,7 +8,7 @@ async function serveSwaggerUI(ctx: Context) {
     await ctx.send({
       root: Deno.cwd(),
       path: "openapi.yaml",
-      contentType: "application/yaml",
+      contentTypes: { yaml: "application/yaml" },
     });
     return;
   }
