@@ -15,9 +15,9 @@
     "scripts/"
   ],
   "lint": {
-    "exclude": ["swagger-ui"]
+    "exclude": ["swagger-ui", "test-results"]
   },
   "fmt": {
-    "exclude": ["swagger-ui"]
+    "exclude": ["swagger-ui", "test-results"]
   }
 }
