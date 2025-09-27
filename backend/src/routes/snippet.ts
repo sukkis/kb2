@@ -6,6 +6,7 @@ import {
   saveSnippet,
 } from "../../kv/kvSnippet.ts"; // we need to open Deno KV for persistence and make the handle available.
 import { getKv } from "../../kv/kvClient.ts";
+import { Snippet } from "../../../shared/types.ts";
 
 // Handler that just writes “hello” as plain‑text
 function sayHello(ctx: Context) {
@@ -45,8 +46,8 @@ async function addSnippet(ctx: Context) {
     payload === null ||
     !("title" in payload) ||
     !("content" in payload) ||
-    !(payload as Record<string, unknown>).title ||
-    !(payload as Record<string, unknown>).content
+    !(payload as Snippet).title ||
+    !(payload as Snippet).content
   ) {
     ctx.response.status = 422;
     ctx.response.type = "application/json";
@@ -59,11 +60,11 @@ async function addSnippet(ctx: Context) {
 
   // convert from Unix Epoch to ISO format
   const formatted = isoTimestamp(Date.now());
-  const created: Record<string, unknown> = {
+  const created: Snippet = {
     uuid: unique_id,
-    title: payload.title,
-    content: payload.content,
-    timestamp: formatted,
+    title: payload.title as string,
+    content: payload.content as string,
+    timestamp: formatted as unknown as number, // stored as number in Snippet interface
   };
 
   // persist the snippet in Deno KV
@@ -96,7 +97,7 @@ async function getSingleSnippet(ctx: RouterContext<"/snippet/:id">) {
 
   ctx.response.status = 200;
   ctx.response.type = "application/json";
-  ctx.response.body = snippet as Record<string, unknown>;
+  ctx.response.body = snippet as Snippet;
 }
 
 // delete single snippet by id
