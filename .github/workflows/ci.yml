@@ -16,23 +16,16 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
 
     steps:
-      # ---------------------------------------------------------
-      # 1️⃣  Checkout the repository
-      # ---------------------------------------------------------
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # ---------------------------------------------------------
-      # 2️⃣  Set up Deno (latest stable)
-      # ---------------------------------------------------------
+        # Set up Deno (latest stable)
       - name: Setup Deno
         uses: denoland/setup-deno@v2
         with:
           deno-version: v2.x # Use Deno 2.x to support lockfile version 5
 
-      # ---------------------------------------------------------
-      # 3️⃣  Cache Deno's module directory ($HOME/.deno)
-      # ---------------------------------------------------------
+      # Cache Deno's module directory ($HOME/.deno)
       - name: Cache Deno modules
         uses: actions/cache@v4
         with:
@@ -42,25 +35,21 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-deno-
 
-      # ---------------------------------------------------------
-      # 4️⃣  Lint the codebase
-      # ---------------------------------------------------------
+      # Lint the codebase
       - name: Run Deno lint
+        working-directory: backend
         run: deno lint
 
-      # ---------------------------------------------------------
-      # 5️⃣  Run the test suite (uses the task you defined)
-      # ---------------------------------------------------------
+      # Run the test suite (uses the task you defined)
       - name: Run tests
+        working-directory: backend
         # The task already contains the needed permission flags
         run: deno task test
 
-      # ---------------------------------------------------------
-      # 6️⃣  (Optional) Upload test results as artifacts
-      # ---------------------------------------------------------
-      # - name: Upload test report
-      #   if: failure()
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: test-output
-      #     path: ./test-results/
+      # Upload test results as artifacts
+      - name: Upload test report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-output
+          path: ./backend/test-results/
