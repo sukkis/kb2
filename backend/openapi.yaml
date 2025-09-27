@@ -24,8 +24,9 @@ paths:
     post:
       summary: Add a new snippet
       description: >
-        Creates a new code snippet. Requires a JSON body with `title` and `content` fields.
-        Returns the created snippet with a generated `uuid` and `timestamp`.
+        Creates a new code snippet. Requires a JSON body with `title` and
+        `content` fields. Returns the created snippet with a generated `uuid`
+        and `timestamp`.
       requestBody:
         required: true
         content:
@@ -79,13 +80,14 @@ paths:
                 properties:
                   error:
                     type: string
-                    example: '`title` and `content` are required'
+                    example: "`title` and `content` are required"
 
   /snippet/{id}:
     get:
       summary: Get a single snippet by ID
       description: >
-        Retrieves a snippet by its unique identifier. Returns the snippet if found.
+        Retrieves a snippet by its unique identifier. Returns the snippet if
+        found.
       parameters:
         - in: path
           name: id
@@ -134,7 +136,9 @@ paths:
     get:
       summary: List all snippets
       description: >
-        Returns an array of all code snippets stored on the server. Each snippet object contains `uuid`, `title`, `content`, and `timestamp` fields. If no snippets exist, returns an empty array.
+        Returns an array of all code snippets stored on the server. Each snippet
+        object contains `uuid`, `title`, `content`, and `timestamp` fields. If
+        no snippets exist, returns an empty array.
       responses:
         "200":
           description: Array of snippet objects
@@ -160,7 +164,8 @@ paths:
     delete:
       summary: Delete a snippet by ID
       description: >
-        Deletes a snippet by its unique identifier. Returns a confirmation message if successful.
+        Deletes a snippet by its unique identifier. Returns a confirmation
+        message if successful.
       parameters:
         - in: path
           name: id
