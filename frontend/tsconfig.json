@@ -4,6 +4,11 @@
     { "path": "./tsconfig.app.json" },
     { "path": "./tsconfig.node.json" }
   ],
-  // ...other options...
-  "lib": ["DOM", "ES2015"]
+  "compilerOptions": {
+    "target": "ES2015",
+    "lib": ["DOM", "ES2015"],
+    "module": "ES2015",
+    "types": ["vitest"],
+    "moduleResolution": "node"
+  }
 }

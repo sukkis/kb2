@@ -1,6 +1,5 @@
 import { Snippet } from "../shared/types";
 
-// @ts-ignore
 export async function fetchSnippets(): Promise<Snippet[]> {
   const res = await fetch("http://localhost:8087/snippets");
   if (!res.ok) throw new Error("Failed to fetch snippets");
@@ -8,7 +7,6 @@ export async function fetchSnippets(): Promise<Snippet[]> {
 }
 
 // check /health from backend
-// @ts-ignore
 export async function checkHealth(): Promise<{ status: string }> {
   const res = await fetch("http://localhost:8087/health");
   if (!res.ok) throw new Error("Backend is not healthy");
@@ -16,7 +14,6 @@ export async function checkHealth(): Promise<{ status: string }> {
 }
 
 // fetch a single snippet by id
-// @ts-ignore
 export async function fetchSnippetById(id: string): Promise<Snippet> {
   const res = await fetch(`http://localhost:8087/snippets/${id}`);
   if (!res.ok) throw new Error("Failed to fetch snippet");
@@ -24,7 +21,6 @@ export async function fetchSnippetById(id: string): Promise<Snippet> {
 }
 
 // create a new snippet
-// @ts-ignore
 export async function createSnippet(
   snippet: Omit<Snippet, "id" | "createdAt" | "updatedAt">,
 ): Promise<Snippet> {
