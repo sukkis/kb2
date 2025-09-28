@@ -1,6 +1,5 @@
 import { Snippet, SnippetRequest } from "../shared/types";
 
-
 // fetch all snippets GET /snippets
 export async function fetchSnippets(): Promise<Snippet[]> {
   const res = await fetch("http://localhost:8087/snippets");
@@ -25,7 +24,7 @@ export async function fetchSnippetById(id: string): Promise<Snippet> {
 // create a new snippet, POST /add
 export async function createSnippet(
   title: string,
-  content: string
+  content: string,
 ): Promise<Snippet> {
   const snippet: SnippetRequest = { title, content };
   const res = await fetch(`http://localhost:8087/add`, {
@@ -45,4 +44,15 @@ export async function deleteSnippet(id: string): Promise<void> {
     method: "DELETE",
   });
   if (!res.ok) throw new Error("Failed to delete snippet");
+}
+
+// search snippets by title, GET /search?query=...
+export async function searchSnippets(
+  query: string,
+): Promise<{ uuid: string; score: number }[]> {
+  const res = await fetch(
+    `http://localhost:8087/search?query=${encodeURIComponent(query)}`,
+  );
+  if (!res.ok) throw new Error("Failed to search snippets");
+  return await res.json();
 }
