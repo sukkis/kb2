@@ -8,7 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.app.json && tsc -p tsconfig.node.json",
-    "test": "vitest run"
+    "test": "VITEST_SHOW_CONSOLE=1 vitest run --reporter=verbose"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^6.2.0",
