@@ -1,4 +1,4 @@
-import { Snippet } from "../../shared/types.ts";
+import { Snippet, SearchResult } from "../../shared/types.ts";
 import {
   assert,
   assertEquals,
@@ -230,4 +230,126 @@ defineTestSuite("Snippet endpoints test suite", async (t, app) => {
       );
     },
   );
-});
+
+
+  // Integration test for /search endpoint
+  await t.step(
+    "GET /search endpoint returns correct SearchResult for matching snippet",
+    async () => {
+      await resetKv();
+      // Add two snippets
+      const snippet1 = {
+        title: "Python Poetry installation",
+        content: "How to install Python packages using Poetry.",
+      };
+      const snippet2 = {
+        title: "Deno KV basics",
+        content: "Introduction to Deno's key-value store.",
+      };
+
+      // Add snippet1
+      const postReq1 = await superoak(app);
+      const postRes1 = await postReq1.post("/add").send(snippet1).expect(201);
+      const _created1 = postRes1.body as Snippet;
+
+      // Add snippet2
+      const postReq2 = await superoak(app);
+      const postRes2 = await postReq2.post("/add").send(snippet2).expect(201);
+      const _created2 = postRes2.body as Snippet;
+
+      // Fetch all snippets to get UUIDs
+      const listReq = await superoak(app);
+      const listRes = await listReq.get("/snippets").expect(200);
+      const allSnippets = listRes.body as Snippet[];
+
+      // Find UUIDs for the snippets
+      const uuid1 = allSnippets.find((s) => s.title === snippet1.title)?.uuid;
+      //const uuid2 = allSnippets.find((s) => s.title === snippet2.title)?.uuid;
+
+      // Perform a search that matches only snippet1
+      const searchReq = await superoak(app);
+      const searchRes = await searchReq.get("/search?query=Poetry").expect(200);
+      const searchResults = searchRes.body as SearchResult[];
+
+      // Assert that the result contains only snippet1's UUID and correct score
+      assertEquals(searchResults.length, 1, "Expected one search result");
+      assertEquals(searchResults[0].uuid, uuid1, "Expected UUID of snippet1");
+      assertEquals(searchResults[0].score, 1, "Expected score of 1 for single word match");
+    },
+    );
+
+    // Negative: /search with query that matches no snippets
+    await t.step(
+      "GET /search endpoint with non-matching query returns empty array",
+      async () => {
+        await resetKv();
+        // Add a snippet
+        const snippet = {
+          title: "Deno KV basics",
+          content: "Introduction to Deno's key-value store.",
+        };
+        const postReq = await superoak(app);
+        await postReq.post("/add").send(snippet).expect(201);
+
+        // Search for a term that does not exist
+        const searchReq = await superoak(app);
+        const searchRes = await searchReq.get("/search?query=foobar").expect(200);
+        const searchResults = searchRes.body as SearchResult[];
+        assertEquals(searchResults.length, 0, "Expected no search results");
+      },
+    );
+
+    // Negative: /search with missing query param
+    await t.step(
+      "GET /search endpoint with missing query param returns error",
+      async () => {
+        const searchReq = await superoak(app);
+        const searchRes = await searchReq.get("/search");
+        assert(
+          [400, 422].includes(searchRes.status),
+          `Expected 400 or 422, got ${searchRes.status}`,
+        );
+        assert(
+          typeof searchRes.body.error === "string",
+          "Expected error message in response body",
+        );
+      },
+    );
+
+    // Negative: /search with overly long query param
+    await t.step(
+      "GET /search endpoint with overly long query param returns error",
+      async () => {
+        const longQuery = "a".repeat(100); // assuming max length is less than 100
+        const searchReq = await superoak(app);
+        const searchRes = await searchReq.get(`/search?query=${longQuery}`);
+        assert(
+          [400, 422].includes(searchRes.status),
+          `Expected 400 or 422, got ${searchRes.status}`,
+        );
+        assert(
+          typeof searchRes.body.error === "string",
+          "Expected error message in response body",
+        );
+      },
+    );
+
+    // Negative: /search with invalid characters in query param
+    await t.step(
+      "GET /search endpoint with invalid characters in query param returns error",
+      async () => {
+        const invalidQuery = "validpart!@#$%^&*()"; // assuming special chars are not allowed
+        const searchReq = await superoak(app);
+        const searchRes = await searchReq.get(`/search?query=${invalidQuery}`);
+        assert(
+          [400, 422].includes(searchRes.status),
+          `Expected 400 or 422, got ${searchRes.status}`,
+        );
+        assert(
+          typeof searchRes.body.error === "string",
+          "Expected error message in response body",
+        );
+      },
+    );
+  },
+);
