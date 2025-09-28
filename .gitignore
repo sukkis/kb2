@@ -1,5 +1,9 @@
 # Emacs
 *~
+
+# Test results
+/backend/test-results
+
 # Angular specific
 /dist/
 /out-tsc/
