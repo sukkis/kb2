@@ -82,10 +82,10 @@ jobs:
       # Start backend test server for frontend tests
       - name: Start backend test server
         working-directory: backend
-        run: |
-          deno run --allow-net --allow-read --allow-write --unstable-kv \
-            startTestServer.ts &
-          echo $! > ../backend_test_server.pid
+        run: >
+          deno run --allow-net --allow-read --allow-write
+          --unstable-kv startTestServer.ts &
+          ;echo $! > ../backend_test_server.pid
 
       # Wait for backend test server to be ready
       - name: Wait for backend test server
