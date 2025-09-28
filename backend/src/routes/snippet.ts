@@ -7,6 +7,7 @@ import {
 } from "../../kv/kvSnippet.ts"; // we need to open Deno KV for persistence and make the handle available.
 import { getKv } from "../../kv/kvClient.ts";
 import { Snippet } from "../../../shared/types.ts";
+import { searchSnippets } from "./search.ts";
 
 // Handler that just writes “hello” as plain‑text
 function sayHello(ctx: Context) {
@@ -160,5 +161,6 @@ router.post("/add", addSnippet);
 router.get("/snippet/:id", getSingleSnippet);
 router.delete("/delete/:id", deleteSnippet);
 router.get("/snippets", listAllSnippets);
+router.get("/search", searchSnippets);
 
 export default router; // ← this is what main.ts will import

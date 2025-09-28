@@ -11,3 +11,10 @@ export interface SnippetRequest {
   title: string;
   content: string;
 }
+
+// search result with relevance score
+// 0 means no match, higher is better
+export interface SearchResult {
+  uuid: string;
+  score: number;
+}
