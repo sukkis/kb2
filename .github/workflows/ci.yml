@@ -23,7 +23,7 @@ jobs:
         os:
           - ubuntu-latest
           - macos-latest
-          - windows-latest
+          # - windows-latest   # our shell scripts are not cross-platform
 
     steps:
       - name: Checkout repository
@@ -82,11 +82,11 @@ jobs:
       # Start backend test server for frontend tests
       - name: Start backend test server
         working-directory: backend
-        run: >
-          deno run --allow-net --allow-read --allow-write
-          --unstable-kv startTestServer.ts &
-          ;echo $! > ../backend_test_server.pid
-
+        # yamllint disable rule:line-length
+        run: |
+          deno run --allow-net --allow-read --allow-write --unstable-kv startTestServer.ts &
+          echo $! > ../backend_test_server.pid
+        # yamllint enable rule:line-length
       # Wait for backend test server to be ready
       - name: Wait for backend test server
         run: sleep 1
