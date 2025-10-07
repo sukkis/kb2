@@ -1,21 +1,24 @@
 # kb2
 
-Tool for adding and searching for snippets, written in TypeScript.
+Add and search code snippets. Backend: Deno, Oak, Deno KV. Frontend: Svelte,
+Vite, TypeScript.
 
-Uses Deno KV for persistence.
+## API
 
-## API Docs
-
-Interactive API documentation is available at `/docs` (Swagger UI). OpenAPI spec
-at `/docs/openapi.yaml`.
+- REST endpoints for snippets: add, get, delete, list, search.
+- Health check: `/health`
+- Docs: `/docs` (Swagger UI), spec at `/docs/openapi.yaml`
 
 ## Usage
 
-- Start server: `deno task dev`
-- Run tests: `deno task test`
+- Backend: `./run.sh backend`
+- Frontend: `./run.sh frontend`
+- Fullstack (backend+frontend): `./run.sh fullstack`
+- Tests: `./run.sh test`
 
 ## Notes
 
-- Static files for Swagger UI are in `swagger-ui/` (excluded from lint and fmt)
-- API endpoints and routers in `src/routes/`
-- Config in `deno.json`
+- Snippets stored in Deno KV.
+- Static files and Swagger UI in `backend/swagger-ui/`.
+- Frontend talks to backend at `localhost:8087`.
+- See `src/routes/` for API logic.
